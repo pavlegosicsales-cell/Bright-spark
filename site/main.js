@@ -357,11 +357,17 @@
       }
       setStatus('');
 
-      fetch(ENDPOINT, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(payload)
+      /* Apps Script 302-redirects a POST and converts it to a GET on the way,
+         which drops the body. Send a GET with URL params instead. The response
+         is opaque under no-cors, so a resolved promise only means the request
+         left the browser, not that the mail went out. */
+      const query = Object.keys(payload)
+        .map(function (k) { return encodeURIComponent(k) + '=' + encodeURIComponent(payload[k]); })
+        .join('&');
+
+      fetch(ENDPOINT + (ENDPOINT.indexOf('?') === -1 ? '?' : '&') + query, {
+        method: 'GET',
+        mode: 'no-cors'
       })
         .then(function () {
           steps.forEach(function (s) { s.classList.remove('is-active'); });

@@ -19,7 +19,20 @@ const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
 
-const CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
+// Chrome lives somewhere different on every OS. Allow an override, then fall
+// back to the usual macOS, Windows and Linux locations.
+const CHROME = process.env.CHROME_PATH || (function () {
+  const candidates = [
+    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+    'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+    'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
+    '/usr/bin/google-chrome',
+    '/usr/bin/chromium-browser',
+    '/usr/bin/chromium'
+  ];
+  for (const c of candidates) { try { if (fs.existsSync(c)) return c; } catch (e) {} }
+  return candidates[0];
+})();
 
 const gsPath = process.argv[2];
 const outDir = process.argv[3];

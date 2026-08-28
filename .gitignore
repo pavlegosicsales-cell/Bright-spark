@@ -1,0 +1,6 @@
+# Firecrawl scrape cache, regenerated on demand
+.firecrawl/
+
+# Windows cruft
+desktop.ini
+Thumbs.db
